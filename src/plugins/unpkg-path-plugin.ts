@@ -2,6 +2,7 @@ import * as esbuild from 'esbuild-wasm'
 
 // import React from 'react'
 // console.log(react)
+//import 'bulma/css/bulma.css'
 
 export const unpkgPathPlugin = () => {
 	return {
