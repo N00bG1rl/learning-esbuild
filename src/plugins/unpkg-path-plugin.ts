@@ -1,8 +1,9 @@
 import * as esbuild from 'esbuild-wasm'
 
-// import React from 'react'
-// console.log(react)
-//import 'bulma/css/bulma.css'
+// import React from 'react';
+// console.log(react);
+// import 'bulma/css/bulma.css';
+// import 'tiny-test-pkg';
 
 export const unpkgPathPlugin = () => {
 	return {
