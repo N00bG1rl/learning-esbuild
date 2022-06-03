@@ -2,8 +2,17 @@ import * as esbuild from 'esbuild-wasm'
 
 // import React from 'react';
 // console.log(react);
+// console.log('Hello world!');
 // import 'bulma/css/bulma.css';
 // import 'tiny-test-pkg';
+
+// import React from 'react'
+// import ReactDOM from 'react-dom'
+
+// const App = () => <h1>Hey</h1>
+
+// const root = ReactDOM.createRoot(document.getElementById('root'))
+// root.render(<App />)
 
 export const unpkgPathPlugin = () => {
 	return {
