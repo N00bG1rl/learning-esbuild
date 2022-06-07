@@ -29,11 +29,16 @@ const Preview: React.FC<PreviewProps> = ({ code }) => {
 
 	useEffect(() => {
 		iframe.current.srcdoc = html
-		iframe.current.contentWindow.postMessage(code, '*')
+
+		// Timeout helps against lagging on code result display
+		setTimeout(() => {
+			iframe.current.contentWindow.postMessage(code, '*')
+		}, 50)
 	}, [code])
 
 	return (
 		<iframe
+			style={{ backgroundColor: 'white', flexGrow: '1' }}
 			ref={iframe}
 			title='preview'
 			sandbox='allow-scripts'
