@@ -1,7 +1,9 @@
+import './Preview.css'
 import { useEffect, useRef } from 'react'
 
 interface PreviewProps {
 	code: string
+	bundlingStatus: string
 }
 
 const html = `
@@ -10,21 +12,30 @@ const html = `
 		 <body>
 		   <div id="root"></div>
 			 <script>
-			   window.addEventListener('message', (event) => {
-					 try {
-						 eval(event.data);
-					 } catch (err) {
-						 const root = document.querySelector('#root');
-						 root.innerHTML = '<div style="color: red;"><h4>Runtime Error: </h4>' + err + '</div>';
-						 console.error(err)
-					 }
-				 }, false)
+				const handleError = (err) => {
+					const root = document.querySelector('#root');
+					root.innerHTML = '<div style="color: red;"><h4>Runtime Error: </h4>' + err + '</div>';
+					console.error(err)
+				}
+
+				window.addEventListener('error', (event) => {
+					event.preventDefault()
+					handleError(event.error)
+				})
+
+			  window.addEventListener('message', (event) => {
+				 try {
+					 eval(event.data);
+				 } catch (err) {
+					 handleError(err)
+				 }
+				}, false)
 			 </script>
 		 </body>
 	 </html>
 `
 
-const Preview: React.FC<PreviewProps> = ({ code }) => {
+const Preview: React.FC<PreviewProps> = ({ code, bundlingStatus }) => {
 	const iframe = useRef<any>()
 
 	useEffect(() => {
@@ -36,14 +47,19 @@ const Preview: React.FC<PreviewProps> = ({ code }) => {
 		}, 50)
 	}, [code])
 
+	console.log(bundlingStatus)
+
 	return (
-		<iframe
-			style={{ backgroundColor: 'white', flexGrow: '1' }}
-			ref={iframe}
-			title='preview'
-			sandbox='allow-scripts'
-			srcDoc={html}
-		/>
+		<div className='iframeWrapper'>
+			<iframe
+				style={{ backgroundColor: 'white', flexGrow: '1' }}
+				ref={iframe}
+				title='preview'
+				sandbox='allow-scripts'
+				srcDoc={html}
+			/>
+			{bundlingStatus && <div className='preview-error'>{bundlingStatus}</div>}
+		</div>
 	)
 }
 
