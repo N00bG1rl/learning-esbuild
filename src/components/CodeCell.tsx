@@ -1,45 +1,60 @@
-import { useState, useEffect } from 'react'
+import './CodeCell.css'
+import { useEffect } from 'react'
 
 import CodeEditor from './CodeEditor'
 import Preview from './Preview'
-import Bundle from '../bundler'
 import Resizable from './Resizable'
+
 import { Cell } from '../state'
 import { useActions } from '../hooks/use-actions'
+import { useTypedSelector } from '../hooks/use-typed-selector'
 
 interface CodeCellProps {
 	cell: Cell
 }
 
 const CodeCell: React.FC<CodeCellProps> = ({ cell }) => {
-	const [err, setErr] = useState('')
-	const [code, setCode] = useState('')
-
-	const { updateCell } = useActions()
+	const { updateCell, createBundle } = useActions()
+	const bundle = useTypedSelector(state => state.bundles[cell.id])
 
 	useEffect(() => {
+		// Display preview window on load not after 1s
+		if (!bundle) {
+			createBundle(cell.id, cell.content)
+			return
+		}
+
 		const timer = setTimeout(async () => {
-			const output = await Bundle(cell.content)
-			setCode(output.code)
-			setErr(output.err)
+			createBundle(cell.id, cell.content)
 		}, 1000)
 
 		// Called automaticaly the NEXT time useEffect is called
 		return () => {
 			clearTimeout(timer)
 		}
-	}, [cell.content])
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [cell.content, cell.id, createBundle])
 
 	return (
 		<Resizable direction='vertical'>
-			<div style={{ height: '100%', display: 'flex', flexDirection: 'row' }}>
+			<div className='code-cell-wrapper'>
 				<Resizable direction='horizontal'>
 					<CodeEditor
 						initialValue={cell.content}
 						onChange={value => updateCell(cell.id, value)}
 					/>
 				</Resizable>
-				<Preview code={code} bundlingStatus={err} />
+				<div className='progress-wrapper'>
+					{
+						!bundle || bundle.loading
+							?
+							<div className='progress-cover'>
+								<progress className='progress is-small is-primary' max="100"></progress>
+							</div>
+
+							: <Preview code={bundle.code} bundlingStatus={bundle.err} />
+					}
+				</div>
 			</div>
 		</Resizable>
 	)
